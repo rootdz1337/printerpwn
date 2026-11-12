@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"bufio"
 	"bytes"
 	"context"
@@ -80,6 +81,10 @@ type Config struct {
 }
 
 var cfg Config
+
+func insecureTLS() *tls.Config {
+	return &tls.Config{InsecureSkipVerify: true}
+}
 
 func main() {
 	target := flag.String("target", "", "Target CIDR (e.g. 192.168.1.0/24) or single IP")
@@ -999,7 +1004,7 @@ func mdnsDiscover() []*Result {
 					if e.Host != "" {
 						r.Hostname = strings.TrimSuffix(e.Host, ".")
 					}
-					for _, f := range e.Text {
+					for _, f := range e.InfoFields {
 						kv := strings.SplitN(f, "=", 2)
 						if len(kv) == 2 {
 							switch strings.ToLower(kv[0]) {
